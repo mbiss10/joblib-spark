@@ -134,10 +134,7 @@ class SparkDistributedBackend(ParallelBackendBase, AutoBatchingMixin):
             # TODO: handle possible spark exception here. # pylint: disable=fixme
             rdd = self._spark.sparkContext.parallelize([0], 1) \
                 .map(lambda _: cloudpickle.dumps(func()))
-            if VersionUtils.majorMinorVersion(pyspark.__version__)[0] < 3:
-                ser_res = rdd.collect()[0]
-            else:
-                ser_res = rdd.collectWithJobGroup(self._job_group, "joblib spark jobs")[0]
+            ser_res = rdd.collect()[0]
             return cloudpickle.loads(ser_res)
 
         return self._get_pool().apply_async(
